@@ -80,6 +80,19 @@ test('franchise', async () => {
   });
 
 
+test('order', async () => {
+  const addItemRes = await request(app).put('/api/order/menu').send({ title: 'Student', description: 'No topping, no sauce, just carbs', image: 'pizza9.png', price: 0.0001 }).set('Authorization', `Bearer ${adminUserAuthToken}`);
+  expect(addItemRes.status).toBe(200);
+
+  const getMenuRes = await request(app).get('/api/order/menu').set('Authorization', `Bearer ${adminUserAuthToken}`);
+  expect(getMenuRes.status).toBe(200);
+  console.log(getMenuRes.body);
+
+  const orderRes = await request(app).post('/api/order').send({ franchiseId: 1, storeId: 1, items: [{ menuId: 1, description: 'Student', price: 0.05 }] }).set('Authorization', `Bearer ${adminUserAuthToken}`);
+  expect(orderRes.status).toBe(200);
+});
+
+
   
   
 
