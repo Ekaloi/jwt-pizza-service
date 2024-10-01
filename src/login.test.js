@@ -21,7 +21,7 @@ async function createAdminUser() {
 
 beforeAll(async () => {
   adminUser = await createAdminUser();
-  loginRes = await request(app).put('/api/auth').send(adminUser);
+  const loginRes = await request(app).put('/api/auth').send(adminUser);
   adminUserAuthToken = loginRes.body.token;
   testUser.email = Math.random().toString(36).substring(2, 12) + '@test.com';
   const registerRes = await request(app).post('/api/auth').send(testUser);
@@ -35,6 +35,8 @@ test('login', async () => {
 
   const { password, ...user } = { ...testUser, roles: [{ role: 'diner' }] };
   expect(loginRes.body.user).toMatchObject(user);
+  expect(loginRes.body.user.password).toBeUndefined();
+  expect(password).toBe('a');
 });
 
 test('logout', async () => {
