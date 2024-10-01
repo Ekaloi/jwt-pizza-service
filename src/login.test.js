@@ -19,18 +19,6 @@ async function createAdminUser() {
   return user;
 }
 
-async function createFranchiseeUser() {
-  let user = { password: 'toomanysecrets', roles: [{ role: Role.Franchisee }] };
-  user.name = "franchiseGuy";
-  user.email = user.name + '@franchise.com';
-
-  await DB.addUser(user);
-  user.password = 'toomanysecrets';
-
-  return user;
-}
-
-
 beforeAll(async () => {
   adminUser = await createAdminUser();
   loginRes = await request(app).put('/api/auth').send(adminUser);
