@@ -1,4 +1,5 @@
 class StatusCodeError extends Error {
+  //This is just for updating on github
   constructor(message, statusCode) {
     super(message);
     this.statusCode = statusCode;
