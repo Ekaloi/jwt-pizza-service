@@ -2,6 +2,19 @@ const config = require('./config.json');
 const os = require('os');
 
 class Metrics {
+    getCpuUsagePercentage() {
+        const cpuUsage = os.loadavg()[0] / os.cpus().length;
+        return cpuUsage.toFixed(2) * 100;
+    }
+
+     getMemoryUsagePercentage() {
+        const totalMemory = os.totalmem();
+        const freeMemory = os.freemem();
+        const usedMemory = totalMemory - freeMemory;
+        const memoryUsage = (usedMemory / totalMemory) * 100;
+        return memoryUsage.toFixed(2);
+    }  
+
   constructor() {
     this.totalRequests = 0;
     this.postRequests = 0;
@@ -34,6 +47,22 @@ class Metrics {
       this.sendMetricNonReqToGrafana('Latency', 'Lat', this.latency);
     }, 10000);
     timer.unref();
+  }
+
+  middleware(req,res,next){
+    let method = req.method;
+    
+    this.incrementRequests();
+    if(method == 'POST'){
+        this.incrementPostRequests();
+    }else if(method == 'PUT'){
+        this.incrementPutRequests();
+    }else if(method == 'DELETE'){
+        this.incrementDelRequests();
+    }else if(method == 'GET'){
+        this.incrementGetRequests();
+    }
+
   }
 
   incrementPizzaSold(){
@@ -122,18 +151,7 @@ class Metrics {
 
 
 
-    getCpuUsagePercentage() {
-        const cpuUsage = os.loadavg()[0] / os.cpus().length;
-        return cpuUsage.toFixed(2) * 100;
-    }
-
-     getMemoryUsagePercentage() {
-        const totalMemory = os.totalmem();
-        const freeMemory = os.freemem();
-        const usedMemory = totalMemory - freeMemory;
-        const memoryUsage = (usedMemory / totalMemory) * 100;
-        return memoryUsage.toFixed(2);
-    }   
+     
 }
 
 const metrics = new Metrics();
