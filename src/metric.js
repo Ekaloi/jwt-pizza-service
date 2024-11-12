@@ -36,8 +36,8 @@ class Metrics {
       this.sendMetricToGrafana('request', 'delete', 'total', this.delRequests);
       this.sendMetricToGrafana('request', 'get', 'total', this.getRequests);
       this.sendMetricToGrafana('request', 'put', 'total', this.putRequests);
-      this.sendMetricNonReqToGrafana('CPU Usage', 'CPU', getCpuUsagePercentage());
-      this.sendMetricNonReqToGrafana('Memory Usage', 'Memory', getMemoryUsagePercentage());
+      this.sendMetricNonReqToGrafana('CPU Usage', 'CPU', this.getCpuUsagePercentage());
+      this.sendMetricNonReqToGrafana('Memory Usage', 'Memory', this.getMemoryUsagePercentage());
       this.sendMetricNonReqToGrafana('Active users', 'users', this.activeUsers);
       this.sendMetricNonReqToGrafana('Successful Login', 'Login', this.successfulLogins);
       this.sendMetricNonReqToGrafana('Failed Login Attempts', 'Login Failed', this.failedLogins);
