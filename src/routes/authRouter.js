@@ -61,8 +61,6 @@ authRouter.authenticateToken = (req, res, next) => {
   if (!req.user) {
     metrics.incrementFailedLogins();
     return res.status(401).send({ message: 'unauthorized' });
-  }else{
-    metrics.incrementSuccessfulLogin();
   }
   next();
 };
@@ -73,10 +71,14 @@ authRouter.post(
   asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
+      metrics.incrementFailedLogins();
       return res.status(400).json({ message: 'name, email, and password are required' });
     }
     const user = await DB.addUser({ name, email, password, roles: [{ role: Role.Diner }] });
     const auth = await setAuth(user);
+    console.log("HIT LOGIN");
+    metrics.incrementSuccessfulLogin();
+    metrics.incrementActiveUsers();
     res.json({ user: user, token: auth });
   })
 );
@@ -88,6 +90,7 @@ authRouter.put(
     const { email, password } = req.body;
     const user = await DB.getUser(email, password);
     const auth = await setAuth(user);
+    metrics.incrementSuccessfulLogin();
     metrics.incrementActiveUsers();
     res.json({ user: user, token: auth });
   })

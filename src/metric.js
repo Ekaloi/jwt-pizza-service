@@ -16,6 +16,9 @@ class Metrics {
     } 
     
     calcPizzaLatency(){
+        if(this.pizzaLatency.length == 0){
+            return 0
+        }
         const sum = this.pizzaLatency.reduce((acc, num) => acc + num, 0);
         const avg = sum / this.pizzaLatency.length;
         this.pizzaLatency = [];
@@ -23,6 +26,9 @@ class Metrics {
     }
 
     calcServiceLatency(){
+        if(this.serviceLatency.length == 0){
+            return 0
+        }
         const sum = this.serviceLatency.reduce((acc, num) => acc + num, 0);
         const avg = sum / this.serviceLatency.length;
         this.serviceLatency = [];
@@ -51,24 +57,22 @@ class Metrics {
       this.sendMetricToGrafana('request', 'delete', 'total', this.delRequests);
       this.sendMetricToGrafana('request', 'get', 'total', this.getRequests);
       this.sendMetricToGrafana('request', 'put', 'total', this.putRequests);
-      this.sendMetricNonReqToGrafana('CPU Usage', 'CPU', this.getCpuUsagePercentage());
-      this.sendMetricNonReqToGrafana('Memory Usage', 'Memory', this.getMemoryUsagePercentage());
-      this.sendMetricNonReqToGrafana('Active users', 'users', this.activeUsers);
-      this.sendMetricNonReqToGrafana('Successful Login', 'Login', this.successfulLogins);
-      this.sendMetricNonReqToGrafana('Failed Login Attempts', 'Login Failed', this.failedLogins);
-      this.sendMetricNonReqToGrafana('Pizzas Sold', 'Pizza', this.pizzaSoldPerMinute);
-      this.sendMetricNonReqToGrafana('Creation Failures','creation failed', this.creationFailures);
-      this.sendMetricNonReqToGrafana('Revenue per minute', 'Rev', this.revenuePerMinute);
-      this.sendMetricNonReqToGrafana('Pizza Latency', 'Lat', this.calcPizzaLatency);
-      this.sendMetricNonReqToGrafana('Service Latency', 'Lat', this.calcServiceLatency);
+      this.sendMetricNonReqToGrafana('cpu_usage', 'cpu', this.getCpuUsagePercentage());
+      this.sendMetricNonReqToGrafana('memory_Usage', 'memory', this.getMemoryUsagePercentage());
+      this.sendMetricNonReqToGrafana('active_users', 'users', this.activeUsers);
+      this.sendMetricNonReqToGrafana('successful_login', 'login', this.successfulLogins);
+      this.sendMetricNonReqToGrafana('failed_login', 'logfailed', this.failedLogins);
+      this.sendMetricNonReqToGrafana('pizzas_sold', 'pizza', this.pizzaSoldPerMinute);
+      this.sendMetricNonReqToGrafana('creation_failures','creation', this.creationFailures);
+      this.sendMetricNonReqToGrafana('revenue_minute', 'rev', this.revenuePerMinute);
+      this.sendMetricNonReqToGrafana('pizza_latency', 'p', this.calcPizzaLatency());
+      this.sendMetricNonReqToGrafana('service_latency', 's', this.calcServiceLatency());
     }, 10000);
     timer.unref();
   }
 
-  middleware(req, res, next){
+  middleware(req, _, next){
     let method = req.method;
-    console.log(res);
-    console.log(next);
     
     this.incrementRequests();
     if(method == 'POST'){
@@ -80,7 +84,9 @@ class Metrics {
     }else if(method == 'GET'){
         this.incrementGetRequests();
     }
+    
 
+    next();
   }
 
   incrementPizzaSold(){
@@ -132,16 +138,16 @@ class Metrics {
   }
 
   sendMetricToGrafana(metricPrefix, httpMethod, metricName, metricValue) {
-    const metric = `${metricPrefix},source=${config.source},method=${httpMethod} ${metricName}=${metricValue}`;
+    const metric = `${metricPrefix},source=${config.metrics.source},method=${httpMethod} ${metricName}=${metricValue}`;
 
-    fetch(`${config.url}`, {
+    fetch(`${config.metrics.url}`, {
       method: 'post',
       body: metric,
-      headers: { Authorization: `Bearer ${config.userId}:${config.apiKey}` },
+      headers: { Authorization: `Bearer ${config.metrics.userId}:${config.metrics.apiKey}` },
     })
       .then((response) => {
         if (!response.ok) {
-          console.error('Failed to push metrics data to Grafana');
+          console.error(`Failed to push ${metric} data to Grafana`);
         } else {
           console.log(`Pushed ${metric}`);
         }
@@ -152,16 +158,15 @@ class Metrics {
   }
 
   sendMetricNonReqToGrafana(metricPrefix, metricName, metricValue) {
-    const metric = `${metricPrefix},source=${config.source} ${metricName}=${metricValue}`;
-
-    fetch(`${config.url}`, {
+    const metric = `${metricPrefix},source=${config.metrics.source} ${metricName}=${metricValue}`;
+    fetch(`${config.metrics.url}`, {
       method: 'post',
       body: metric,
-      headers: { Authorization: `Bearer ${config.userId}:${config.apiKey}` },
+      headers: { Authorization: `Bearer ${config.metrics.userId}:${config.metrics.apiKey}` },
     })
       .then((response) => {
         if (!response.ok) {
-          console.error('Failed to push metrics data to Grafana');
+            console.error(`Failed to push ${metricName} data to Grafana`);
         } else {
           console.log(`Pushed ${metric}`);
         }
