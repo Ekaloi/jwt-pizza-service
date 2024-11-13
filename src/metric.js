@@ -49,8 +49,10 @@ class Metrics {
     timer.unref();
   }
 
-  middleware(req, _res, _next){
+  middleware(req, res, next){
     let method = req.method;
+    console.log(res);
+    console.log(next);
     
     this.incrementRequests();
     if(method == 'POST'){
