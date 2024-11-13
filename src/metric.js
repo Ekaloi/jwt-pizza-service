@@ -49,7 +49,7 @@ class Metrics {
     timer.unref();
   }
 
-  middleware(req,res,next){
+  middleware(req, _res, _next){
     let method = req.method;
     
     this.incrementRequests();
