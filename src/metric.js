@@ -27,7 +27,8 @@ class Metrics {
     this.pizzaSoldPerMinute = 0;
     this.creationFailures = 0;
     this.revenuePerMinute = 0;
-    this.latency = [];
+    this.pizzaLatency = [];
+    this.serviceLatency = [];
 
     // This will periodically sent metrics to Grafana
     const timer = setInterval(() => {
@@ -87,7 +88,7 @@ class Metrics {
     this.activeUsers++;
   }
 
-  decrementActiveUSers(){
+  decrementActiveUsers(){
     this.activeUsers--;
   }
 
@@ -109,6 +110,10 @@ class Metrics {
 
   incrementDelRequests() {
     this.delRequests++;
+  }
+
+  incrementCreationsFailed(){
+    this.creationFailures++;
   }
 
   sendMetricToGrafana(metricPrefix, httpMethod, metricName, metricValue) {
