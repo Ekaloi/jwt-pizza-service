@@ -88,7 +88,7 @@ orderRouter.post(
     const j = await r.json();
     if (r.ok) {
       metrics.incrementPizzaSold();
-      const totalPrice = response.order.items.reduce((total, item) => total + item.price, 0);
+      const totalPrice = res.order.items.reduce((total, item) => total + item.price, 0);
       metrics.addRevenue(totalPrice);
       
       res.on('finish', () => {
