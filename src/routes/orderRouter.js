@@ -88,7 +88,7 @@ orderRouter.post(
     const j = await r.json();
     if (r.ok) {
       metrics.incrementPizzaSold();
-      metrics.addRevenue(order.price);
+      metrics.addRevenue(res.price);
       
       res.on('finish', () => {
         const diff = process.hrtime(start);
