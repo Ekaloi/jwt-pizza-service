@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('jwt-pizza-service/src/service.js');
+const app = require('./service.js');
 const { DB, Role } = require('./database/database.js');
 
 const testUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
