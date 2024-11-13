@@ -92,7 +92,7 @@ orderRouter.post(
       
       res.on('finish', () => {
         const diff = process.hrtime(start);
-        const latency = diff[0] * 1e3 + diff[1] * 1e-6; // Convert to milliseconds
+        const latency = diff[0] * 1e3 + diff[1] * 1e-6; 
         metrics.pizzaLatency.push(latency)
       });
       res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
