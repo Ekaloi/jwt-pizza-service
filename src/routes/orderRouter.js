@@ -79,6 +79,7 @@ orderRouter.post(
   asyncHandler(async (req, res) => {
     const orderReq = req.body;
     const order = await DB.addDinerOrder(req.user, orderReq);
+    const start = process.hrtime();
     const r = await fetch(`${config.factory.url}/api/order`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', authorization: `Bearer ${config.factory.apiKey}` },
@@ -88,6 +89,12 @@ orderRouter.post(
     if (r.ok) {
       metrics.incrementPizzaSold();
       metrics.addRevenue(order.price);
+      
+      res.on('finish', () => {
+        const diff = process.hrtime(start);
+        const latency = diff[0] * 1e3 + diff[1] * 1e-6; // Convert to milliseconds
+        metrics.pizzaLatency.push(latency)
+      });
       res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
     } else {
       metrics.incrementCreationsFailed();

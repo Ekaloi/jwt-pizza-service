@@ -13,7 +13,21 @@ class Metrics {
         const usedMemory = totalMemory - freeMemory;
         const memoryUsage = (usedMemory / totalMemory) * 100;
         return memoryUsage.toFixed(2);
-    }  
+    } 
+    
+    calcPizzaLatency(){
+        const sum = this.pizzaLatency.reduce((acc, num) => acc + num, 0);
+        const avg = sum / this.pizzaLatency.length;
+        this.pizzaLatency = [];
+        return avg;
+    }
+
+    calcServiceLatency(){
+        const sum = this.serviceLatency.reduce((acc, num) => acc + num, 0);
+        const avg = sum / this.serviceLatency.length;
+        this.serviceLatency = [];
+        return avg;
+    }
 
   constructor() {
     this.totalRequests = 0;
@@ -45,7 +59,8 @@ class Metrics {
       this.sendMetricNonReqToGrafana('Pizzas Sold', 'Pizza', this.pizzaSoldPerMinute);
       this.sendMetricNonReqToGrafana('Creation Failures','creation failed', this.creationFailures);
       this.sendMetricNonReqToGrafana('Revenue per minute', 'Rev', this.revenuePerMinute);
-      this.sendMetricNonReqToGrafana('Latency', 'Lat', this.latency);
+      this.sendMetricNonReqToGrafana('Pizza Latency', 'Lat', this.calcPizzaLatency);
+      this.sendMetricNonReqToGrafana('Service Latency', 'Lat', this.calcServiceLatency);
     }, 10000);
     timer.unref();
   }

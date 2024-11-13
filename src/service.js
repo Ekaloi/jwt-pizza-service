@@ -8,6 +8,15 @@ const  metrics = require('./metric.js');
 
 const app = express();
 app.use(metrics.middleware.bind(metrics));
+app.use((req, res, next) => {
+  const start = process.hrtime();
+  res.on('finish', () => {
+    const diff = process.hrtime(start);
+    const latency = diff[0] * 1e3 + diff[1] * 1e-6; // Convert to milliseconds
+    metrics.serviceLatency.push(latency)
+  });
+  next();
+});
 app.use(express.json());
 app.use(setAuthUser);
 app.use((req, res, next) => {
