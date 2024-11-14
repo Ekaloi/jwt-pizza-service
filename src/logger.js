@@ -20,7 +20,7 @@ class Logger {
     next();
   };
 
-  pizzaLogger = (req, res) => httpLogger = (req, res, next) => {
+  pizzaLogger = (req, res) => {
     let send = res.send;
     res.send = (resBody) => {
       const logData = {
