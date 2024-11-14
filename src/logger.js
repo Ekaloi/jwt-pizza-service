@@ -20,6 +20,24 @@ class Logger {
     next();
   };
 
+  pizzaLogger = (req, res) => httpLogger = (req, res, next) => {
+    let send = res.send;
+    res.send = (resBody) => {
+      const logData = {
+        authorized: !!req.headers.authorization,
+        path: req.path,
+        method: req.method,
+        statusCode: res.statusCode,
+        reqBody: JSON.stringify(req.body),
+        resBody: JSON.stringify(resBody),
+      };
+      const level = this.statusToLogLevel(res.statusCode);
+      this.log(level, 'pizza', logData);
+      res.send = send;
+      return res.send(resBody);
+    };
+  }
+
   log(level, type, logData) {
     const labels = { component: config.logging.source, level: level, type: type };
     const values = [this.nowString(), this.sanitize(logData)];
