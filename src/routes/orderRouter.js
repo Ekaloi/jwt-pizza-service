@@ -91,7 +91,7 @@ orderRouter.post(
       metrics.incrementPizzaSold();
       const totalPrice = res.order.items.reduce((total, item) => total + item.price, 0);
       metrics.addRevenue(totalPrice);
-      logger.pizzaLogger(req, res);
+      // logger.pizzaLogger(req, res);
       res.on('finish', () => {
         const diff = process.hrtime(start);
         const latency = diff[0] * 1e3 + diff[1] * 1e-6; 
@@ -100,7 +100,7 @@ orderRouter.post(
       res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
     } else {
       metrics.incrementCreationsFailed();
-      logger.pizzaLogger(req, res);
+      // logger.pizzaLogger(req, res);
       res.status(500).send({ message: 'Failed to fulfill order at factory', reportUrl: j.reportUrl });
     }
   })
