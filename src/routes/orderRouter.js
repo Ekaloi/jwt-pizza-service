@@ -89,8 +89,12 @@ orderRouter.post(
     const j = await r.json();
     if (r.ok) {
       metrics.incrementPizzaSold();
-      // const totalPrice = res.order.items.reduce((total, item) => total + item.price, 0);
-      // metrics.addRevenue(totalPrice);
+      if (res.order && Array.isArray(res.order.items)) {
+        const totalPrice = res.order.items.reduce((total, item) => total + item.price, 0);
+        metrics.addRevenue(totalPrice);
+     } else {
+        console.error("Order or items property is undefined.");
+      }
       logger.pizzaLogger(req, res);
       res.on('finish', () => {
         const diff = process.hrtime(start);
